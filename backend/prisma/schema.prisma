@@ -1,0 +1,51 @@
+// Prisma schema for AccessFlow
+// This is the initial schema. It will be extended as modules are implemented.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(uuid())
+  email       String   @unique
+  password    String
+  name        String
+  role        String
+  requests    Request[] @relation("UserRequests")
+  approved    Request[] @relation("ApprovedBy")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Request {
+  id          String   @id @default(uuid())
+  type        RequestType
+  amount      Float?
+  resource    String?
+  reason      String
+  status      RequestStatus @default(PENDING)
+  createdBy   User     @relation("UserRequests", fields: [createdById], references: [id])
+  createdById String
+  approvedBy  User?    @relation("ApprovedBy", fields: [approvedById], references: [id])
+  approvedById String?
+  rejectionReason String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum RequestType {
+  WITHDRAW
+  DEPOSIT
+  ACCESS
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
