@@ -1,0 +1,38 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    container_name: accessflow_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: accessflow
+    ports:
+      - '5433:5432'
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    container_name: accessflow_backend
+    restart: always
+    env_file:
+      - ./backend/.env
+    ports:
+      - '4000:4000'
+    depends_on:
+      - db
+    command: sh -c "npx prisma migrate deploy && npm run start"
+
+  frontend:
+    build: ./frontend
+    container_name: accessflow_frontend
+    restart: always
+    ports:
+      - '3000:3000'
+    depends_on:
+      - backend
+
+volumes:
+  db_data:

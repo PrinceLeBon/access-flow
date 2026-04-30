@@ -1,6 +1,3 @@
-// Prisma schema for AccessFlow
-// This is the initial schema. It will be extended as modules are implemented.
-
 generator client {
   provider = "prisma-client-js"
 }
